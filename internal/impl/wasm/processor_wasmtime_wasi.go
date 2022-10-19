@@ -12,7 +12,7 @@ import (
 	"github.com/benthosdev/benthos/v4/public/service"
 )
 
-func wasiProcessorConfig() *service.ConfigSpec {
+func wasmtimeWASIProcessorConfig() *service.ConfigSpec {
 	return service.NewConfigSpec().
 		// Stable(). TODO
 		Categories("Utility").
@@ -39,21 +39,21 @@ There is a specific docker tag postfix ` + "`-cgo`" + ` for C builds containing 
 		Version("X.X.X")
 }
 
-func init() {
-	err := service.RegisterProcessor(
-		"wasm_wasi", wasiProcessorConfig(),
-		func(conf *service.ParsedConfig, mgr *service.Resources) (service.Processor, error) {
-			return newWasiProcessorFromConfig(conf)
-		})
+// func init() {
+// 	err := service.RegisterProcessor(
+// 		"wasm_wasi", wasmtimeWASIProcessorConfig(),
+// 		func(conf *service.ParsedConfig, mgr *service.Resources) (service.Processor, error) {
+// 			return newWasmtimeWASIProcessorFromConfig(conf)
+// 		})
 
-	if err != nil {
-		panic(err)
-	}
-}
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// }
 
 //------------------------------------------------------------------------------
 
-type wasiProcessor struct {
+type wasmtimeWASIProcessor struct {
 	engine *wasmtime.Engine
 	module *wasmtime.Module
 	linker *wasmtime.Linker
@@ -63,7 +63,7 @@ type wasiProcessor struct {
 	removeIODir bool
 }
 
-func newWasiProcessorFromConfig(conf *service.ParsedConfig) (*wasiProcessor, error) {
+func newWasmtimeWASIProcessorFromConfig(conf *service.ParsedConfig) (*wasmtimeWASIProcessor, error) {
 	pathStr, err := conf.FieldString("path")
 	if err != nil {
 		return nil, err
@@ -81,10 +81,10 @@ func newWasiProcessorFromConfig(conf *service.ParsedConfig) (*wasiProcessor, err
 		}
 	}
 
-	return newProcessor(fileBytes, ioDir)
+	return newWasmtimeWASIProcessor(fileBytes, ioDir)
 }
 
-func newProcessor(wasmBinary []byte, ioDir string) (*wasiProcessor, error) {
+func newWasmtimeWASIProcessor(wasmBinary []byte, ioDir string) (*wasmtimeWASIProcessor, error) {
 	engine := wasmtime.NewEngine()
 
 	module, err := wasmtime.NewModule(engine, wasmBinary)
@@ -97,7 +97,7 @@ func newProcessor(wasmBinary []byte, ioDir string) (*wasiProcessor, error) {
 		return nil, err
 	}
 
-	p := &wasiProcessor{
+	p := &wasmtimeWASIProcessor{
 		engine: engine,
 		module: module,
 		linker: linker,
@@ -115,7 +115,7 @@ func newProcessor(wasmBinary []byte, ioDir string) (*wasiProcessor, error) {
 	return p, nil
 }
 
-func (p *wasiProcessor) Process(ctx context.Context, msg *service.Message) (service.MessageBatch, error) {
+func (p *wasmtimeWASIProcessor) Process(ctx context.Context, msg *service.Message) (service.MessageBatch, error) {
 	inBytes, err := msg.AsBytes()
 	if err != nil {
 		return nil, err
@@ -126,7 +126,7 @@ func (p *wasiProcessor) Process(ctx context.Context, msg *service.Message) (serv
 	}
 
 	wasiConfig := wasmtime.NewWasiConfig()
-	wasiConfig.SetArgv([]string{string(inBytes)})
+	wasiConfig.SetArgv([]string{"BENTHOS_WASI", string(inBytes)})
 	if err := wasiConfig.SetStdoutFile(p.stdoutPath); err != nil {
 		return nil, err
 	}
@@ -153,7 +153,7 @@ func (p *wasiProcessor) Process(ctx context.Context, msg *service.Message) (serv
 	return service.MessageBatch{msg}, nil
 }
 
-func (p *wasiProcessor) Close(ctx context.Context) error {
+func (p *wasmtimeWASIProcessor) Close(ctx context.Context) error {
 	if p.removeIODir {
 		return os.RemoveAll(p.ioDir)
 	}

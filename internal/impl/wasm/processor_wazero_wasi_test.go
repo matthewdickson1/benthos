@@ -11,11 +11,11 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestWASIProcessor(t *testing.T) {
+func TestWazeroWASIProcessor(t *testing.T) {
 	wasm, err := os.ReadFile("./testprog/main.wasm")
 	require.NoError(t, err)
 
-	proc, err := newProcessor(wasm, "")
+	proc, err := newWazeroWASIProcessor(wasm)
 	require.NoError(t, err)
 	t.Cleanup(func() {
 		require.NoError(t, proc.Close(context.Background()))
@@ -29,14 +29,14 @@ func TestWASIProcessor(t *testing.T) {
 	resBytes, err := outBatch[0].AsBytes()
 	require.NoError(t, err)
 
-	assert.Equal(t, "HELLO WORLD WASM RULES\n", string(resBytes))
+	assert.Equal(t, "BENTHOS_WASI WASM RULES\nHELLO WORLD WASM RULES\n", string(resBytes))
 }
 
-func BenchmarkWASICalls(b *testing.B) {
+func BenchmarkWazeroWASICalls(b *testing.B) {
 	wasm, err := os.ReadFile("./testprog/main.wasm")
 	require.NoError(b, err)
 
-	proc, err := newProcessor(wasm, "")
+	proc, err := newWazeroWASIProcessor(wasm)
 	require.NoError(b, err)
 	b.Cleanup(func() {
 		require.NoError(b, proc.Close(context.Background()))

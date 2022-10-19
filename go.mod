@@ -39,7 +39,7 @@ require (
 	github.com/bradfitz/gomemcache v0.0.0-20220106215444-fb4bf637b56d
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/bxcodec/faker/v3 v3.8.0
-	github.com/bytecodealliance/wasmtime-go v0.38.1
+	github.com/bytecodealliance/wasmtime-go v1.0.0
 	github.com/cenkalti/backoff/v4 v4.1.3
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/clbanning/mxj/v2 v2.5.5
@@ -113,7 +113,8 @@ require (
 	github.com/sirupsen/logrus v1.8.1
 	github.com/smira/go-statsd v1.3.2
 	github.com/snowflakedb/gosnowflake v1.6.6
-	github.com/stretchr/testify v1.7.5
+	github.com/stretchr/testify v1.8.0
+	github.com/tetratelabs/wazero v1.0.0-pre.2 // indirect
 	github.com/tilinna/z85 v1.0.0
 	github.com/twmb/franz-go v1.3.1
 	github.com/twmb/franz-go/pkg/kmsg v0.0.0-20220106200407-cfd3330d96f5
